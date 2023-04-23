@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 
 const app = express();
 
-app.use(express.json());
+app.use(bodyParser.raw({inflate:true, limit: '100kb', type: 'application/json'}));
+
 app.get("/", (req, res) => {
   console.log("MAIN");
 });
@@ -14,10 +15,9 @@ app.listen(3001, () => {
   console.log(`Listening on port 3001`);
 });
 
-// DB Url --> mongodb://atlas-sql-644266307e2fa467f5d27127-utayl.a.query.mongodb.net/sample_analytics?ssl=true&authSource=admin
- 
-// Replace the following with your Atlas connection string                                                                                                                                        
-const url = "mongodb://atlas-sql-644266307e2fa467f5d27127-utayl.a.query.mongodb.net/sample_analytics?ssl=true&authSource=admin";
+// DB Url --> mongodb+srv://SarimSaljook:sarim@cluster1.srbuvsf.mongodb.net/investment_insightDB
+                                                                                                                                     
+const url = "mongodb+srv://SarimSaljook:sarim@cluster1.srbuvsf.mongodb.net/investment_insightDB";
 const client = new MongoClient(url);
 
 async function run() {
@@ -34,14 +34,14 @@ async function run() {
 }
 
 // Set up MongoDB connection
-const mongoUrl = 'mongodb://atlas-sql-644266307e2fa467f5d27127-utayl.a.query.mongodb.net/sample_analytics?ssl=true&authSource=admin';
+const mongoUrl = 'mongodb+srv://SarimSaljook:sarim@cluster1.srbuvsf.mongodb.net/investment_insightDB';
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 // Define User schema
 const userSchema = new mongoose.Schema({
-  id: Object,  
+  _id: Object,  
   username: String,
   password: String,
   name: String,
@@ -50,29 +50,28 @@ const userSchema = new mongoose.Schema({
 });
 
 // Define User model
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('users', userSchema);
 
 // Define POST endpoint for adding user data to MongoDB
-app.post('/addUser', (req, res) => {
-  const { id, username, password, name, email, phone_number } = req.body;
+app.post('/addUser', async (req, res) => {
+const { _id, username, password, name, email, phone_number } = JSON.parse(req.body);
 
   const user = new User({
-    id: id,
+    _id: _id,
     username: username,
     password: password,
     name: name,
     email: email,
     phone_number: phone_number
-  });
+  }); 
 
-  user.save((err) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send('Error saving user data to MongoDB');
-    } else {
-      res.status(200).send('User data saved to MongoDB');
-    }
-  });
+  console.log(JSON.parse(req.body));
+
+     await user.save().then(() => {
+      console.log("USER ADDED SUCCESSFULLY!");   
+      res.send({ "status" : "USER ADDED SUCCESSFULLY!" })
+    }).catch((err) => console.log(err));
+
 });
 
 
