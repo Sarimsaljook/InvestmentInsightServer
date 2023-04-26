@@ -74,5 +74,37 @@ const { _id, username, password, name, email, phone_number } = JSON.parse(req.bo
 
 });
 
+app.post('/loginUser', async (req, res) => {
+  const { username, password } = JSON.parse(req.body);
+  // Set up MongoDB connection
+    const mongoUrl = 'mongodb+srv://SarimSaljook:sarim@cluster1.srbuvsf.mongodb.net/investment_insightDB';
+    mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
+    const db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+    var collection = db.collection('users');  // get reference to the collection
+  
+    const query = { "username" : username, "password" : password };
+    const projection = {
+        "username": 1,
+        "password": 1,
+       }
+
+    collection.findOne(query, projection)
+    .then(result => {
+      if(result) {
+        console.log(`Successfully found: ${result.username}.`);
+        res.send({ "status" : "USER FOUND" });
+      } else {
+        console.log("No document matches the provided query.");
+        res.send({ "status" : "NO USER FOUND" });
+      }
+      return result;
+    })
+    .catch(err => {
+      console.error(`Failed to find document: ${err}`);
+      res.send({ "status" : "ERROR" });
+    });
+});
 
 run().catch(console.dir);
