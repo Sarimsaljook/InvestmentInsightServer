@@ -107,4 +107,34 @@ app.post('/loginUser', async (req, res) => {
     });
 });
 
+// Define User schema
+const expenseSchema = new mongoose.Schema({
+  user: String, 
+  expense_title: String, 
+  expense_amount: String, 
+  expense_date: String
+});
+
+// Define User model
+const Expense = mongoose.model('monthly_expenses', expenseSchema);
+
+app.post('/addExpense', async (req, res) => {
+  const { user, expense_title, expense_amount, expense_date } = JSON.parse(req.body);
+  
+    const expense = new Expense({
+      user: user, 
+      expense_title: expense_title, 
+      expense_amount: expense_amount, 
+      expense_date: expense_date
+    }); 
+  
+    console.log(JSON.parse(req.body));
+  
+       await expense.save().then(() => {
+        console.log("NEW EXPENSE ADDED SUCCESSFULLY!");   
+        res.send({ "status" : "NEW EXPENSE ADDED SUCCESSFULLY!" })
+      }).catch((err) => console.log(err));
+  
+  });
+
 run().catch(console.dir);
