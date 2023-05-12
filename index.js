@@ -137,4 +137,49 @@ app.post('/addExpense', async (req, res) => {
   
   });
 
+app.post('/getUserExpenses', async (req, res) => {
+  const { user } = JSON.parse(req.body);
+  console.log(JSON.parse(req.body));
+
+  var collection = db.collection("monthly_expenses");
+
+  collection.find({
+    user: user
+  });
+
+  console.log(expenses);
+  res.send({ "status" : "something happened"});
+});
+
+app.post('/setBudget', async (req, res) => {
+  const { budget_amount, username } = JSON.parse(req.body);
+  console.log(JSON.parse(req.body));
+
+  try {
+
+    var collection = db.collection("users");
+
+    const filter = { username: username };
+    // this option instructs the method to create a document if no documents match the filter
+    const options = { upsert: true };
+    // create a document that sets the budget
+    const updateDoc = {
+       $set: {
+         "monthly_budget_target" : budget_amount
+       }
+    };
+    const result = await collection.updateOne(filter, updateDoc, options);
+    console.log(
+      `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`,
+    );
+
+  } finally {
+    await client.close();
+    res.send({ 
+      "status" : "Budget for "+username+" Updated!"
+    }) 
+  }
+
+}),
+
 run().catch(console.dir);
