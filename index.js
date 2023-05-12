@@ -143,12 +143,15 @@ app.post('/getUserExpenses', async (req, res) => {
 
   var collection = db.collection("monthly_expenses");
 
-  collection.find({
+   const cursor = collection.find({
     user: user
   });
 
-  console.log(expenses);
-  res.send({ "status" : "something happened"});
+  const allValues = await cursor.toArray();
+
+  console.log(allValues);
+
+  res.send({ "User's Expenses" : allValues});
 });
 
 app.post('/setBudget', async (req, res) => {
