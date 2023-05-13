@@ -185,4 +185,22 @@ app.post('/setBudget', async (req, res) => {
 
 }),
 
+app.post('/getUserBudget', async (req, resp) => {
+  const { user } = JSON.parse(req.body);
+  console.log(JSON.parse(req.body));
+
+  var collection = db.collection("users");
+
+   await collection.findOne({
+    username: user
+  }).then((res) => {
+    console.log(res);
+    resp.send({ "User's Budget" : res.monthly_budget_target});
+  }).catch((err) => {
+    console.log(err);
+    resp.send({ "Error" : err});
+  });
+
+});
+
 run().catch(console.dir);
