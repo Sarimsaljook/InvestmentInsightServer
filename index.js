@@ -203,4 +203,30 @@ app.post('/getUserBudget', async (req, resp) => {
 
 });
 
+app.post('/deleteExpense', async (req, res) => {
+  const { expense_title } = JSON.parse(req.body);
+  console.log(JSON.parse(req.body));
+
+  try {
+
+  var collection = db.collection("monthly_expenses");
+
+  const query = { expense_title: expense_title };
+
+  const result = await collection.deleteOne(query);
+
+  if (result.deletedCount === 1) {
+    console.log("Successfully deleted one document.");
+    res.send({"status" : "Successfully deleted one document."});
+  } else {
+    console.log("No documents matched the query. Deleted 0 documents.");
+    res.send({"status" : "No documents matched the query. Deleted 0 documents."});
+    } 
+    
+} finally {
+  await client.close();
+}
+
+});
+
 run().catch(console.dir);
