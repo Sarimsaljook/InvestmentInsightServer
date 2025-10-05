@@ -1,3 +1,3 @@
 # InvestmentInsightServer
 
-Node js REST api for personal finacse manager application
+Node js REST api for personal finance manager application
